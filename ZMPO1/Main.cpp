@@ -6,17 +6,17 @@
 #define zero_Value 0
 using namespace std;
 
-int offsetPosFromOffAr(int** offArray, int arrSize, int pos);
-void assValue(int** offArray, int** valArray, int* arrSize, int* vecLenght, int val, int pos, int defValue);
-void deleteValFromVec(int** offArray, int** valArray, int* arrSize, int posToDel);
-int findPosToIns(int** offArray, int arrSize, int pos);
 void printCommands();
 void mkNewVec(int newlength, int newdef, int** offArray, int** valArray, int* vecL, int*arrL, int* defVal);
-void rewriteArray(int** offArray, int** valArray, int* arrSize, int findedPos, int val, int pos);
-void print(int** offArray, int** valArray, int arrSize, int vecSize, int defVal);
 void changeSize(int* vecSize, int* arrSize, int** offArray, int** valArray, int trimSize);
+void assValue(int** offArray, int** valArray, int* arrSize, int* vecLenght, int val, int pos, int defValue);
+int offsetPosFromOffAr(int** offArray, int arrSize, int pos);
+void print(int** offArray, int** valArray, int arrSize, int vecSize, int defVal);
 void delete_everything(int** offArray, int** valArray, int*vecSize, int* arrSize, int* defVal);
 void setDefault(int* arrSize, int* defVal, int* newDefVal);
+void deleteValFromVec(int** offArray, int** valArray, int* arrSize, int posToDel);
+int findPosToIns(int** offArray, int arrSize, int pos);
+void rewriteArray(int** offArray, int** valArray, int* arrSize, int findedPos, int val, int pos);
 void getValFromPos(int pos, int** offArray, int** valArray, int arrLength, int defVal, int vecSize);
 void incorrectInput();
 
@@ -132,6 +132,8 @@ void printCommands() {
 	cout << "exit - exit\n";
 }
 
+/*Creates new vector and deletes the old one if any exists. The offset and value arrays are not allocated.
+The initial values set to default*/
 void mkNewVec(int newlength, int newdef, int** offArray, int** valArray, int* vecL, int*arrL, int* defVal) {
 	if (*arrL > 0)
 	{
@@ -144,6 +146,8 @@ void mkNewVec(int newlength, int newdef, int** offArray, int** valArray, int* ve
 	*defVal = newdef;
 }
 
+/*Changes size of existing vector. The size must be greater than zero. If any offset values exist and they exceed the
+new size they are erased from the array*/
 void changeSize(int* vecSize, int* arrSize, int** offArray, int** valArray, int trimSize)
 {
 	if ((*vecSize) > 0)
@@ -158,16 +162,12 @@ void changeSize(int* vecSize, int* arrSize, int** offArray, int** valArray, int 
 		}
 		*vecSize = trimSize;
 	}
+	else
+		incorrectInput();
 }
 
 /*Function assignes given value to a given position of a vector. If position exceeds the lenght of a vector
-an information about an error is prompted. Othewrise the value is assigned.Parameters:
-offArray - table of offsets
-valArray - table of values
-arrSize - size of valArray / offArray
-vecLenght - lenght of a vector
-val - value to assign
-pos - position to which assign a value*/
+an information about an error is prompted. Othewrise the value is assigned.*/
 void assValue(int** offArray, int** valArray, int* arrSize, int* vecLenght, int val, int pos, int defValue)
 {
 	if (pos >= *vecLenght || pos < 0)
@@ -190,7 +190,7 @@ void assValue(int** offArray, int** valArray, int* arrSize, int* vecLenght, int 
 	}
 }
 
-/*Chceck whether the possition is currently in offset. If it is in the offset arr return its index.
+/*Chceck whether the possition is currently in offset. If it is in the offset array then return its index.
 Otherwise return -1*/
 int offsetPosFromOffAr(int** offArray, int arrSize, int pos) {
 	for (int i = 0; i < arrSize; i++)
@@ -199,6 +199,8 @@ int offsetPosFromOffAr(int** offArray, int arrSize, int pos) {
 	return -1;
 }
 
+/*Prints the vector as a string. The positions which don't exist in the offset array are replaced by
+default's vector value.*/
 void print(int** offArray, int** valArray, int arrSize, int vecSize, int defVal)
 {
 	int* outputArr = new int[vecSize];
@@ -212,6 +214,7 @@ void print(int** offArray, int** valArray, int arrSize, int vecSize, int defVal)
 	cout << endl;
 }
 
+/*Deletes everythin from a vector. The initial values are asisigned to zero*/
 void delete_everything(int** offArray, int** valArray, int* vecSize, int* arrSize, int* defVal) {
 	if (*arrSize > 0) {
 		delete[] * offArray;
@@ -222,6 +225,7 @@ void delete_everything(int** offArray, int** valArray, int* vecSize, int* arrSiz
 	*defVal = zero_Value;
 }
 
+/*Sets defaults value to a vector. Works only if all values are default values(array size is equal zero*/
 void setDefault(int* arrSize, int* defVal, int* newDefVal)
 {
 	if ((*arrSize) != 0)
@@ -232,7 +236,8 @@ void setDefault(int* arrSize, int* defVal, int* newDefVal)
 
 
 
-/*Delete value from a given position. */
+/*Delete value from a given position. Allocates new space for a smaller array,
+rewrites the old array and omits the deleting value*/
 void deleteValFromVec(int** offArray, int** valArray, int* arrSize, int posToDel)
 {
 	(*arrSize)--;
@@ -256,7 +261,7 @@ void deleteValFromVec(int** offArray, int** valArray, int* arrSize, int posToDel
 	*valArray = newValArray;
 }
 
-/*Find position in offArray to insert new offset*/
+/*Find position in offArray to insert new offset - search for the position using ascending order sort*/
 int findPosToIns(int** offArray, int arrSize, int pos)
 {
 	int i = 0;
@@ -266,7 +271,8 @@ int findPosToIns(int** offArray, int arrSize, int pos)
 	return i;
 }
 
-/*Resize array, rewrite old values to new array, delete old array */
+/*Resizes array by one position - allocates space for new array greater by one position,
+rewrites old values to new array, deletes old array */
 void rewriteArray(int** offArray, int** valArray, int* arrSize, int findedPos, int val, int pos) {
 
 	(*arrSize)++;
@@ -292,12 +298,12 @@ void rewriteArray(int** offArray, int** valArray, int* arrSize, int findedPos, i
 
 	newOffArray[findedPos] = pos;
 	newValArray[findedPos] = val;
-	for (int i = 0; i < *arrSize; i++)
-		cout << newOffArray[i];
 	*offArray = newOffArray;
 	*valArray = newValArray;
 }
 
+/*Gets a value from a given position within a range of vector size.
+If the value deosn't exist in offset array a default value is returned*/
 void getValFromPos(int pos, int** offArray, int** valArray, int arrLength, int defVal, int vecSize)
 {
 	if (pos >= vecSize || pos < 0)
@@ -316,7 +322,8 @@ void getValFromPos(int pos, int** offArray, int** valArray, int arrLength, int d
 /*Inform abour incorrect data */
 void incorrectInput()
 {
-	cout << "Bledne parametry, funkcja nie moze zostac wykonana\nSprobuj ponownie\n";
+	cout << "Bledne parametry albo wektor nie istnieje, funkcja nie moze zostac wykonana\nSprobuj ponownie\n";
 }
+
 
 
