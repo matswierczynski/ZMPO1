@@ -18,6 +18,7 @@ void deleteValFromVec(int** offArray, int** valArray, int* arrSize, int posToDel
 int findPosToIns(int** offArray, int arrSize, int pos);
 void rewriteArray(int** offArray, int** valArray, int* arrSize, int findedPos, int val, int pos);
 void getValFromPos(int pos, int** offArray, int** valArray, int arrLength, int defVal, int vecSize);
+int sumEvenPos(int** offArray, int** valArray, int arrLength, int defVal, int vecSize);
 void incorrectInput();
 
 int main() {
@@ -107,6 +108,11 @@ int main() {
 
 			}
 
+			else if (s == "sumEvenPos")
+			{
+				cout << "Suma elementow na parzystych pozycjach: " << sumEvenPos(&offArray, &valArray, arrLength, defVal, vecLength) << "\n";
+			}
+
 			else if (s == "exit")
 			{
 				delete_everything(&offArray, &valArray, &vecLength, &arrLength, &defVal);
@@ -129,6 +135,7 @@ void printCommands() {
 	cout << "print - print\n";
 	cout << "del - delete everything\n";
 	cout << "setDef <def> - set default\n";
+	cout << "sumEvenPos - sum even positions\n";
 	cout << "exit - exit\n";
 }
 
@@ -183,8 +190,13 @@ void assValue(int** offArray, int** valArray, int* arrSize, int* vecLenght, int 
 		}
 		else
 		{
-			int findedPos = findPosToIns(offArray, *arrSize, pos);
-			rewriteArray(offArray, valArray, arrSize, findedPos, val, pos);
+			if (val != defValue) 
+			{
+				int findedPos = findPosToIns(offArray, *arrSize, pos);
+				rewriteArray(offArray, valArray, arrSize, findedPos, val, pos);
+				for (int i = 0; i < *arrSize; i++)
+					cout << (*offArray)[i];
+			}
 
 		}
 	}
@@ -271,7 +283,24 @@ int findPosToIns(int** offArray, int arrSize, int pos)
 	return i;
 }
 
-/*Resizes array by one position - allocates space for new array greater by one position,
+int sumEvenPos(int** offArray, int** valArray, int arrLength, int defVal, int vecSize)
+{
+	int noOfPosInOff = 0;
+	int suma = 0;
+	for (int i = 0; i < arrLength; i++)
+	{
+		if ((((*offArray)[i]) % 2) == 0)
+		{
+			noOfPosInOff++;
+			suma += (*valArray[i]);
+		}
+		
+	}
+	suma += ((vecSize +1 - noOfPosInOff)/2)*defVal;
+	return suma;
+}
+
+/*Resizes array by one position - allocates space for new array greater by one from old size,
 rewrites old values to new array, deletes old array */
 void rewriteArray(int** offArray, int** valArray, int* arrSize, int findedPos, int val, int pos) {
 
@@ -279,7 +308,7 @@ void rewriteArray(int** offArray, int** valArray, int* arrSize, int findedPos, i
 	int* newOffArray = new int[*arrSize];
 	int* newValArray = new int[*arrSize];
 
-	if (*arrSize > 1) {
+	if (*arrSize > 1) { //if new array has more than 1 position, in other case nold array consists of no elements->no need to rewrite
 		for (int i = 0; i < findedPos; i++)
 		{
 			newOffArray[i] = (*offArray)[i];
